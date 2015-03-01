@@ -1,1 +1,1 @@
-This is my third data visulization project
+This is my third data visualization project
