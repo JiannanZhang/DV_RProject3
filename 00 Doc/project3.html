@@ -179,7 +179,7 @@ hljs.initHighlightingOnLoad();
 </head>
 
 <body>
-<p>Project 2 required Jeffrey and I to import a large dataset into Oracle Server and call the data into RStudio for analysis. Below will describe the dataset and the following analysis. </p>
+<p>Project 3 required Jeffrey and I to import a large dataset into Oracle Server and call the data into RStudio for analysis. Below will describe the dataset and the following analysis. </p>
 
 <p>Dataset: </p>
 
@@ -193,55 +193,112 @@ hljs.initHighlightingOnLoad();
 </code></pre>
 
 <pre><code>## 
-## &gt; require(&quot;jsonlite&quot;)
-</code></pre>
-
-<pre><code>## Loading required package: jsonlite
-## 
-## Attaching package: &#39;jsonlite&#39;
-## 
-## The following object is masked from &#39;package:utils&#39;:
-## 
-##     View
-</code></pre>
-
-<pre><code>## 
-## &gt; require(dplyr)
-## 
 ## &gt; df_06 &lt;- data.frame(fromJSON(getURL(URLencode(&quot;129.152.144.84:5001/rest/native/?query=\&quot;select * from GOVSPENDING2006\&quot;&quot;), 
 ## +     httpheader = c(DB  .... [TRUNCATED]
 </code></pre>
 
-<pre><code>## Error in parseJSON(txt): lexical error: invalid char in json text.
-##           BANY COUNTY&quot;, &quot;PRINCE GEORGE&quot;S&quot;, &quot;THURSTON COUNTY&quot;, &quot;LUBBOCK
-##                      (right here) ------^
+<pre><code class="r">tbl_df(df_06)
+</code></pre>
+
+<pre><code>## Source: local data frame [161 x 26]
+## 
+##               UNIQUE_TRANSACTION_ID ACCOUNT_TITLE
+## 1  e3de047550aec610222209d0a898fa48          null
+## 2  78c176a32903954b17e3f493f0c628f0          null
+## 3  b180b4bcbc24a427a21fb28c396024c9          null
+## 4  cc3eca56946bb44ec487bbce36b3aab6          null
+## 5  b72f3b6c16ff40e006ffa3db0d1f41ea          null
+## 6  07f21250f6eca0a9de40b67d63c7280d          null
+## 7  3fe0c277a4c6bcb5515589f43d0ea134          null
+## 8  4b3c3f74d3e8f58ef775dcc9b4cc24f6          null
+## 9  8741b74e9b6851920410b6d60beb262e          null
+## 10 67ca0c352a2fed3d95d8247539e60979          null
+## ..                              ...           ...
+## Variables not shown: RECIPIENT_NAME (fctr), RECIPIENT_CITY_NAME (fctr),
+##   RECIPIENT_COUNTY_NAME (fctr), RECIPIENT_ZIP (fctr), RECIPIENT_TYPE
+##   (fctr), AGENCY_CODE (fctr), FED_FUNDING_AMOUNT (int),
+##   NON_FED_FUNDING_AMOUNT (int), TOTAL_FUNDING_AMOUNT (int),
+##   OBLIGATION_ACTION_DATE (fctr), STARTING_DATE (fctr), ENDING_DATE (fctr),
+##   PRINCIPAL_PLACE_STATE (fctr), PRINCIPAL_PLACE_CC (fctr),
+##   PRINCIPAL_PLACE_ZIP (fctr), AGENCY_NAME (fctr), RECEIP_ADDR1 (fctr),
+##   RECEIP_ADDR2 (fctr), FACE_LOAN_GURAN (int), ORIG_SUB_GURAN (int),
+##   RECIP_CAT_TYPE (fctr), MAJ_AGENCY_CAT (fctr), RECIPIENT_COUNTRY_CODE
+##   (fctr), SERIALID (int)
 </code></pre>
 
 <pre><code class="r">source(&quot;../01 data/df_07.R&quot;,echo = T)
 </code></pre>
 
 <pre><code>## 
-## &gt; require(&quot;jsonlite&quot;)
-## 
-## &gt; require(dplyr)
-## 
 ## &gt; df_07 &lt;- data.frame(fromJSON(getURL(URLencode(&quot;129.152.144.84:5001/rest/native/?query=\&quot;select * from GOVSPENDING2007\&quot;&quot;), 
 ## +     httpheader = c(DB  .... [TRUNCATED]
 </code></pre>
 
-<pre><code>## Error in parseJSON(txt): lexical error: invalid char in json text.
-##           TMENT OF FINANCE&quot;, &quot;CHILDREN&quot;S HOSPITAL OF PENNSLYVANIA&quot;, &quot;N
-##                      (right here) ------^
-</code></pre>
-
 <p><strong>3. begin analysis</strong>
-First we want to know how many federal funds each city has. A city could receive the federal funds many times a year and there are also some blank entries (no city names). I did these data wrangling in the following </p>
+First we want to know how many federal funds that each city has. A city could receive the federal funds many times a year and there are also some blank entries (no city names). I did these data wrangling in the following: </p>
 
-<pre><code class="r">df_06 %&gt;% select(recipient_city_name,fed_funding_amount_06) %&gt;% ggplot(aes(x=recipient_city_name, y=fed_funding_amount_06,color=recipient_city_name))  + geom_point() + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+<p>First I plotted the original dataset</p>
+
+<pre><code class="r">df_06 %&gt;% select(RECIPIENT_CITY_NAME,FED_FUNDING_AMOUNT_06) %&gt;% ggplot(aes(x=RECIPIENT_CITY_NAME, y=FED_FUNDING_AMOUNT_06,color=RECIPIENT_CITY_NAME))  + geom_point() + theme(axis.text.x = element_text(angle = 90, hjust = 1))
 </code></pre>
 
-<pre><code>## Error in eval(expr, envir, enclos): object &#39;df_06&#39; not found
+<pre><code>## Error in eval(expr, envir, enclos): object &#39;FED_FUNDING_AMOUNT_06&#39; not found
 </code></pre>
+
+<p>I filtered the blank entries and plotted the graph</p>
+
+<pre><code class="r">df_06 %&gt;% select(RECIPIENT_CITY_NAME,FED_FUNDING_AMOUNT_06) %&gt;% filter(RECIPIENT_CITY_NAME != &quot;&quot;) %&gt;% ggplot(aes(x=RECIPIENT_CITY_NAME, y=FED_FUNDING_AMOUNT_06,color=RECIPIENT_CITY_NAME))  + geom_point() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
+</code></pre>
+
+<pre><code>## Error in eval(expr, envir, enclos): object &#39;FED_FUNDING_AMOUNT_06&#39; not found
+</code></pre>
+
+<p>I sum the totol funds for each city for both df_06 and df_07</p>
+
+<pre><code class="r">df_06_city_total_fund &lt;- df_06_city_spending %&gt;% select(RECIPIENT_CITY_NAME) %&gt;% group_by(RECIPIENT_CITY_NAME) %&gt;% summarize(total_spending = sum(df_06$FED_FUNDING_AMOUNT_06)) 
+</code></pre>
+
+<pre><code>## Error in eval(expr, envir, enclos): object &#39;df_06_city_spending&#39; not found
+</code></pre>
+
+<pre><code class="r">df_07_city_total_fund &lt;- df_07_city_spending %&gt;% select(RECIPIENT_CITY_NAME) %&gt;% group_by(RECIPIENT_CITY_NAME) %&gt;% summarize(total_spending = sum(df_07$fed_funding_amount_07)) 
+</code></pre>
+
+<pre><code>## Error in eval(expr, envir, enclos): object &#39;df_07_city_spending&#39; not found
+</code></pre>
+
+<p>Then I inner join two dataset above by city</p>
+
+<pre><code class="r">join_by_city &lt;- inner_join(df_06_city_total_fund,df_07_city_total_fund,by = &quot;RECIPIENT_CITY_NAME&quot;)
+</code></pre>
+
+<pre><code>## Error in inner_join(df_06_city_total_fund, df_07_city_total_fund, by = &quot;RECIPIENT_CITY_NAME&quot;): object &#39;df_06_city_total_fund&#39; not found
+</code></pre>
+
+<pre><code class="r">names(join_by_city) &lt;- c(&quot;City&quot;,&quot;Total_fed_fund_06&quot;,&quot;Total_fed_fund_07&quot;)
+</code></pre>
+
+<pre><code>## Error in names(join_by_city) &lt;- c(&quot;City&quot;, &quot;Total_fed_fund_06&quot;, &quot;Total_fed_fund_07&quot;): object &#39;join_by_city&#39; not found
+</code></pre>
+
+<p>Use bubble plot to visualize the gragh. First plot bubble plot: fed_fund_06 VS Cities
+From the bubble graph, we can easily to see the difference of federal fund amount between these cities by the bubble size</p>
+
+<pre><code class="r">join_by_city %&gt;% ggplot(aes(x=RECIPIENT_CITY_NAME, y=total_fed_fund_06, size = total_fed_fund_06,color=total_fed_fund_06)) + geom_point() + theme(axis.text.x=element_text(angle=80, size=20, vjust=0.5)) + theme(axis.text.x=element_text(size=10, face=&quot;bold&quot;, vjust=1)) + theme(axis.title.x=element_text(color=&quot;forestgreen&quot;, vjust=0.35),axis.title.y=element_text(color=&quot;cadetblue&quot;, vjust=0.35)) + labs(title=&quot;Fed_fund_06 VS Cities&quot;,y=&quot;Total_fund&quot;,x=&quot;City&quot;)
+</code></pre>
+
+<pre><code>## Error in eval(expr, envir, enclos): object &#39;join_by_city&#39; not found
+</code></pre>
+
+<p>Same for 2007</p>
+
+<pre><code class="r">join_by_city %&gt;% ggplot(aes(x=RECIPIENT_CITY_NAME, y=Total_fed_fund_07, size = Total_fed_fund_07,color=Total_fed_fund_07)) + geom_point() + theme(axis.text.x=element_text(angle=80, size=20, vjust=0.5)) + theme(axis.text.x=element_text(size=10, face=&quot;bold&quot;, vjust=1)) + theme(axis.title.x=element_text(color=&quot;forestgreen&quot;, vjust=0.35),axis.title.y=element_text(color=&quot;cadetblue&quot;, vjust=0.35)) + labs(title=&quot;Fed_fund_07 VS Cities&quot;,y=&quot;Total_fund&quot;,x=&quot;City&quot;)
+</code></pre>
+
+<pre><code>## Error in eval(expr, envir, enclos): object &#39;join_by_city&#39; not found
+</code></pre>
+
+<p>continue this part&hellip;</p>
 
 </body>
 

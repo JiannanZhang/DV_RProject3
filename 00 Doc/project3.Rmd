@@ -17,6 +17,7 @@ __1. Loading of R packages: RCurl, ggplot2, dplyr, tidyr (R code not shown)__
 library(RCurl)
 library (ggplot2)
 library(extrafont)
+require("jsonlite")
 require(dplyr)
 require(tidyr)
 ```
@@ -24,6 +25,7 @@ require(tidyr)
 __2. Import dataset from Oracle server__
 ```{r}
 source("../01 data/df_06.R",echo = T)
+tbl_df(df_06)
 source("../01 data/df_07.R",echo = T)
 
 ```
@@ -38,7 +40,7 @@ df_06 %>% select(recipient_city_name,fed_funding_amount_06) %>% ggplot(aes(x=rec
 I filtered the blank entries and plotted the graph
 
 ```{r}
-> df_06 %>% select(recipient_city_name,fed_funding_amount_06) %>% filter(recipient_city_name != "") %>% ggplot(aes(x=recipient_city_name, y=fed_funding_amount_06,color=recipient_city_name))  + geom_point() + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+df_06 %>% select(recipient_city_name,fed_funding_amount_06) %>% filter(recipient_city_name != "") %>% ggplot(aes(x=recipient_city_name, y=fed_funding_amount_06,color=recipient_city_name))  + geom_point() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
 ```
 
 I sum the totol funds for each city for both df_06 and df_07
@@ -49,19 +51,27 @@ df_07_city_total_fund <- df_07_city_spending %>% select(recipient_city_name) %>%
 
 Then I inner join two dataset above by city
 ```{r}
-join_by_city <- inner_join(df_06_city_unique_spending,df_07_unique_city_spending,by = "recipient_city_name")
-names(join_by_city) <- c("recipient_city_name","total_fed_fund_06","total_fed_fund_07")
+join_by_city <- inner_join(df_06_city_total_fund,df_07_city_total_fund,by = "recipient_city_name")
+names(join_by_city) <- c("City","Total_fed_fund_06","Total_fed_fund_07")
 ```
 
 Use bubble plot to visualize the gragh. First plot bubble plot: fed_fund_06 VS Cities
 From the bubble graph, we can easily to see the difference of federal fund amount between these cities by the bubble size
 ```{r}
-join_by_city %>% ggplot(aes(x=recipient_city_name, y=total_fed_fund_06, size = total_fed_fund_06,color=total_fed_fund_06)) + geom_point() + theme(axis.text.x=element_text(angle=80, size=20, vjust=0.5)) + theme(axis.text.x=element_text(size=10, face="bold", vjust=1)) + theme(axis.title.x=element_text(color="forestgreen", vjust=0.35),axis.title.y=element_text(color="cadetblue", vjust=0.35)) + labs(title="Fed_fund_06 VS Cities",y="Total_fund",x="City")
+join_by_city %>% ggplot(aes(x=recipient_city_name, y=total_fed_fund_06, size = total_fed_fund_06,color=total_fed_fund_06)) + geom_point() + theme(axis.text.x=element_text(angle=90, size=20, vjust=0.5)) + theme(axis.text.x=element_text(size=10, face="bold", vjust=1)) + theme(axis.title.x=element_text(color="forestgreen", vjust=0.35),axis.title.y=element_text(color="cadetblue", vjust=0.35)) + labs(title="Fed_fund_06 VS Cities",y="Total_fund",x="City")
 ```
 
 Same for 2007
 ```{r}
-join_by_city %>% ggplot(aes(x=recipient_city_name, y=total_fed_fund_07, size = total_fed_fund_07,color=total_fed_fund_07)) + geom_point() + theme(axis.text.x=element_text(angle=80, size=20, vjust=0.5)) + theme(axis.text.x=element_text(size=10, face="bold", vjust=1)) + theme(axis.title.x=element_text(color="forestgreen", vjust=0.35),axis.title.y=element_text(color="cadetblue", vjust=0.35)) + labs(title="Fed_fund_07 VS Cities",y="Total_fund",x="City")
+join_by_city %>% ggplot(aes(x=recipient_city_name, y=Total_fed_fund_07, size = Total_fed_fund_07,color=Total_fed_fund_07)) + geom_point() + theme(axis.text.x=element_text(angle=90, size=20, vjust=0.5)) + theme(axis.text.x=element_text(size=10, face="bold", vjust=1)) + theme(axis.title.x=element_text(color="forestgreen", vjust=0.35),axis.title.y=element_text(color="cadetblue", vjust=0.35)) + labs(title="Fed_fund_07 VS Cities",y="Total_fund",x="City")
 ```
 
-continue this part...
+Now I will make a boxplot to see the range and quatiles of 2006 fund and 2007 fund 
+```{r}
+df_totol_fund <- c(join_by_city$total_fed_fund_06, join_by_city$total_fed_fund_07)
+df_total_fund <- data.frame(df_totol_fund)
+df_year <- c(rep(c(2006),each=44),rep(c(2007),each=44))
+df_year <- data.frame(df_year)
+df_fund_year <- data.frame(df_total_fund,df_year)
+
+```
