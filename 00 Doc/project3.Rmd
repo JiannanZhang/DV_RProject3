@@ -7,11 +7,11 @@ output: html_document
 
 Project 3 required Jeffrey and I to import a large dataset into Oracle Server and call the data into RStudio for analysis. Below will describe the dataset and the following analysis. 
 
-Dataset: 
+Dataset: GOVSPENDING2007, GOVSPENDING2007, GOVSPENDING2008, GOVSPENDING2009
 
 Oracle SQL Developer: C##CS329E_JCN565
 
-__1. Loading of R packages: RCurl, ggplot2, dplyr, tidyr (R code not shown)__
+__1. Loading of R packages: RCurl, ggplot2, extrafont, jsonlite, dplyr, tidyr (R code not shown)__
 
 ```{r, include=FALSE}
 library(RCurl)
@@ -27,38 +27,40 @@ __2. Import dataset from Oracle server__
 source("../01 data/df_06.R",echo = T)
 tbl_df(df_06)
 source("../01 data/df_07.R",echo = T)
-
+tbl_df(df_07)
+source("../01 data/dfcensus.R",echo = T)
+tbl_df(dfpop)
 ```
 __3. begin analysis__
 First we want to know how many federal funds that each city has. A city could receive the federal funds many times a year and there are also some blank entries (no city names). I did these data wrangling in the following: 
 
 First I plotted the original dataset
 ```{r}
-df_06 %>% select(recipient_city_name,fed_funding_amount_06) %>% ggplot(aes(x=recipient_city_name, y=fed_funding_amount_06,color=recipient_city_name))  + geom_point() + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+df_06 %>% select(RECIPIENT_CITY_NAME,FED_FUNDING_AMOUNT_06) %>% ggplot(aes(x=RECIPIENT_CITY_NAME, y=FED_FUNDING_AMOUNT_06,color=RECIPIENT_CITY_NAME))  + geom_point() + theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
 
 I filtered the blank entries and plotted the graph
 
 ```{r}
-df_06 %>% select(recipient_city_name,fed_funding_amount_06) %>% filter(recipient_city_name != "") %>% ggplot(aes(x=recipient_city_name, y=fed_funding_amount_06,color=recipient_city_name))  + geom_point() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
+df_06 %>% select(RECIPIENT_CITY_NAME,FED_FUNDING_AMOUNT_06) %>% filter(RECIPIENT_CITY_NAME != "") %>% ggplot(aes(x=RECIPIENT_CITY_NAME, y=FED_FUNDING_AMOUNT_06,color=RECIPIENT_CITY_NAME))  + geom_point() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
 ```
 
 I sum the totol funds for each city for both df_06 and df_07
 ```{r}
-df_06_city_total_fund <- df_06_city_spending %>% select(recipient_city_name) %>% group_by(recipient_city_name) %>% summarize(total_spending = sum(df_06$fed_funding_amount_06)) 
-df_07_city_total_fund <- df_07_city_spending %>% select(recipient_city_name) %>% group_by(recipient_city_name) %>% summarize(total_spending = sum(df_07$fed_funding_amount_07)) 
+df_06_city_total_fund <- df_06_city_spending %>% select(RECIPIENT_CITY_NAME) %>% group_by(RECIPIENT_CITY_NAME) %>% summarize(total_spending = sum(df_06$FED_FUNDING_AMOUNT_06)) 
+df_07_city_total_fund <- df_07_city_spending %>% select(RECIPIENT_CITY_NAME) %>% group_by(RECIPIENT_CITY_NAME) %>% summarize(total_spending = sum(df_07$FED_FUNDING_AMOUNT_07)) 
 ```
 
 Then I inner join two dataset above by city
 ```{r}
-join_by_city <- inner_join(df_06_city_total_fund,df_07_city_total_fund,by = "recipient_city_name")
+join_by_city <- inner_join(df_06_city_total_fund,df_07_city_total_fund,by = "RECIPIENT_CITY_NAME")
 names(join_by_city) <- c("City","Total_fed_fund_06","Total_fed_fund_07")
 ```
 
 Use bubble plot to visualize the gragh. First plot bubble plot: fed_fund_06 VS Cities
 From the bubble graph, we can easily to see the difference of federal fund amount between these cities by the bubble size
 ```{r}
-join_by_city %>% ggplot(aes(x=recipient_city_name, y=total_fed_fund_06, size = total_fed_fund_06,color=total_fed_fund_06)) + geom_point() + theme(axis.text.x=element_text(angle=90, size=20, vjust=0.5)) + theme(axis.text.x=element_text(size=10, face="bold", vjust=1)) + theme(axis.title.x=element_text(color="forestgreen", vjust=0.35),axis.title.y=element_text(color="cadetblue", vjust=0.35)) + labs(title="Fed_fund_06 VS Cities",y="Total_fund",x="City")
+join_by_city %>% ggplot(aes(x=RECIPIENT_CITY_NAME, y=total_fed_fund_06, size = total_fed_fund_06,color=total_fed_fund_06)) + geom_point() + theme(axis.text.x=element_text(angle=90, size=20, vjust=0.5)) + theme(axis.text.x=element_text(size=10, face="bold", vjust=1)) + theme(axis.title.x=element_text(color="forestgreen", vjust=0.35),axis.title.y=element_text(color="cadetblue", vjust=0.35)) + labs(title="Fed_fund_06 VS Cities",y="Total_fund",x="City")
 ```
 
 Same for 2007
