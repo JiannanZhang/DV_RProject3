@@ -92,6 +92,7 @@ Plot the boxplot. Since there are many outliers in 2006 and 2007 as we can see, 
 df_fund_year %>% ggplot(aes(factor(Year),Total_fund)) + geom_boxplot() + theme(axis.text.x=element_text(size=10, face="bold", vjust=1)) + theme(axis.title.x=element_text(color="forestgreen", vjust=0.35),axis.title.y=element_text(color="cadetblue", vjust=0.35)) + labs(title="Boxplot",y="Total_fund",x="Year")
 ```
 
+
 ```{r}
 names(dfpop) <- c('PRINCIPAL_PLACE_STATE','RECIPIENT_COUNTY_NAME','POPULATION')
 df_state <- dfpop %>% select (PRINCIPAL_PLACE_STATE, POPULATION) %>% group_by(PRINCIPAL_PLACE_STATE) %>% summarise(sum(POPULATION))
@@ -100,3 +101,4 @@ df_state07 <- df_07 %>% select (PRINCIPAL_PLACE_STATE, FED_FUNDING_AMOUNT_07) %>
 dfsamestate <- inner_join(df_state06,df_state07,by = 'PRINCIPAL_PLACE_STATE')
 dffull <- full_join(df_state06,df_state07, by = 'PRINCIPAL_PLACE_STATE')
 dffull2 <- inner_join(dffull, df_state, by = 'PRINCIPAL_PLACE_STATE')
+```
