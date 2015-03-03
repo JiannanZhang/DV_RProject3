@@ -7,7 +7,7 @@ output: html_document
 
 Project 3 required Jeffrey and I to import a large dataset into Oracle Server and call the data into RStudio for analysis. Below will describe the dataset and the following analysis. 
 
-Dataset: GOVSPENDING2007, GOVSPENDING2007, GOVSPENDING2008, GOVSPENDING2009
+Dataset: GOVSPENDING2007, GOVSPENDING2007, GOVSPENDING2008, CENSUSCOUNTY
 
 Oracle SQL Developer: C##CS329E_JCN565
 
@@ -100,10 +100,29 @@ df_state06 <- df_06 %>% select (PRINCIPAL_PLACE_STATE, FED_FUNDING_AMOUNT_06) %>
 df_state07 <- df_07 %>% select (PRINCIPAL_PLACE_STATE, FED_FUNDING_AMOUNT_07) %>% group_by(PRINCIPAL_PLACE_STATE) %>% summarise(sum(FED_FUNDING_AMOUNT_07))
 
 dfsamestate <- inner_join(df_state06,df_state07,by = 'PRINCIPAL_PLACE_STATE')
-mdf <- melt(dfsamestate, id.vars = 'PRINCIPAL_PLACE_STATE', measure.vars = c('sum(FED_FUNDING_AMOUNT_06)', 'sum(FED_FUNDING_AMOUNT_07)'))
-ggplot(mdf,aes(x = 'PRINCIPAL_PLACE_STATE', y = value, color = variable)) + geom_point()
+mdf <- melt(dfsamestate, id.vars = 'PRINCIPAL_PLACE_STATE', measure.vars = c('sum(FED_FUNDING_AMOUNT_06)', 'sum(FED_FUNDING_AMOUNT_07)')) %>% ggplot(aes(x = PRINCIPAL_PLACE_STATE, y = value, color = variable)) + geom_point()
+
 
 
 dffull <- full_join(df_state06,df_state07, by = 'PRINCIPAL_PLACE_STATE')
+names(dffull) <- c('PRINCIPAL_PLACE_STATE','FED_FUNDING_AMOUNT_06','FED_FUNDING_AMOUNT_07')
+
+dfsum <- dffull %>% select(FED_FUNDING_AMOUNT_06, FED_FUNDING_AMOUNT_07)  %>% summarise(T_FED_FUNDING_AMOUNT_06=cumsum(FED_FUNDING_AMOUNT_06), T_FED_FUNDING_AMOUNT_07 = cumsum(FED_FUNDING_AMOUNT_07))
+
 dffull2 <- inner_join(dffull, df_state, by = 'PRINCIPAL_PLACE_STATE')
+names(dffull2) <- c('PRINCIPAL_PLACE_STATE','FED_FUNDING_AMOUNT_06','FED_FUNDING_AMOUNT_07', 'POPULATION')
+dffull3 <- dffull2 %>% mutate(perperson06 = FED_FUNDING_AMOUNT_06/POPULATION, perperson07 = FED_FUNDING_AMOUNT_07/POPULATION)
+mdf2 <- melt(dffull3, id.vars = 'PRINCIPAL_PLACE_STATE', measure.vars= c('perperson06','perperson07'))
+ggplot(mdf2,aes(x = PRINCIPAL_PLACE_STATE, y = value, color = variable)) + geom_point()  + theme(axis.text.x=element_text(angle=90, size=12, vjust=0.5)) + labs(title="Governmental Funding Broken Down\nPer Person",y="Total Funding per Person",x="State")
+```
+
+```{r}
+categoricals <- eval(parse(text=substring(getURL(URLencode('http://129.152.144.84:5001/rest/native/?query="select * from GOVSPENDING2006"'), httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521:ORCL', USER='C##cs329e_jcn565', PASS='orcl_jcn565', MODE='native_mode', MODEL='model', returnFor = 'R', returnDimensions = 'True'), verbose = TRUE), 1, 2^31-1)))
+# Need to insert image of the categorial variables we have. 
+
+png("../00 Doc/categoricals.png", width = 25, height = 10, units = "in", res = 72)
+grid.newpage()
+pushViewport(viewport(layout = grid.layout(1, 12)))   
+
+print(categoricals, vp = viewport(layout.pos.row = 1, layout.pos.col = 1:4))
 ```
