@@ -80,7 +80,7 @@ join_by_city %>% ggplot(aes(x=City, y=Total_fed_fund_07, size = Total_fed_fund_0
 Now I will make a boxplot to see the range and quatiles of 2006 fund and 2007 fund 
 ```{r}
 df_total_fund <- c(join_by_city$Total_fed_fund_06, join_by_city$Total_fed_fund_07)
-df_total_fund <- data.frame(df_totol_fund)
+df_total_fund <- data.frame(df_total_fund)
 df_year <- c(rep(c(2006),each=44),rep(c(2007),each=44))
 df_year <- data.frame(df_year)
 df_fund_year <- data.frame(df_total_fund,df_year)
@@ -116,13 +116,4 @@ mdf2 <- melt(dffull3, id.vars = 'PRINCIPAL_PLACE_STATE', measure.vars= c('perper
 ggplot(mdf2,aes(x = PRINCIPAL_PLACE_STATE, y = value, color = variable)) + geom_point()  + theme(axis.text.x=element_text(angle=90, size=12, vjust=0.5)) + labs(title="Governmental Funding Broken Down\nPer Person",y="Total Funding per Person",x="State")
 ```
 
-```{r}
-categoricals <- eval(parse(text=substring(getURL(URLencode('http://129.152.144.84:5001/rest/native/?query="select * from GOVSPENDING2006"'), httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521:ORCL', USER='C##cs329e_jcn565', PASS='orcl_jcn565', MODE='native_mode', MODEL='model', returnFor = 'R', returnDimensions = 'True'), verbose = TRUE), 1, 2^31-1)))
-# Need to insert image of the categorial variables we have. 
 
-png("../00 Doc/categoricals.png", width = 25, height = 10, units = "in", res = 72)
-grid.newpage()
-pushViewport(viewport(layout = grid.layout(1, 12)))   
-
-print(categoricals, vp = viewport(layout.pos.row = 1, layout.pos.col = 1:4))
-```
