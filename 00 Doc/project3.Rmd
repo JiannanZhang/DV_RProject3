@@ -49,7 +49,6 @@ source("../02 Data Wrangling/DR1.R",echo = T)
 source("../02 Data Wrangling/DR2.R",echo = T)
 ```
 
-<<<<<<< HEAD
 __I sum the totol funds for each city for both df_06 and df_07__
 ```{r}
 source("../02 Data Wrangling/DR3.R",echo = T)
