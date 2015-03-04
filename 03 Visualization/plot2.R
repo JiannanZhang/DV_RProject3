@@ -1,1 +1,1 @@
-boxplot(join_by_city_left$total_spending.x)
+boxplot(join_by_city_left$total_spending.x,main="Boxplot",xlab="2007",ylab="Total_fund")
