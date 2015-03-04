@@ -1,0 +1,6 @@
+df_total_fund <- c(join_by_city$Total_fed_fund_06, join_by_city$Total_fed_fund_07)
+df_total_fund <- data.frame(df_total_fund)
+df_year <- c(rep(c(2006),each=45),rep(c(2007),each=45))
+df_year <- data.frame(df_year)
+df_fund_year <- data.frame(df_total_fund,df_year)
+names(df_fund_year) <- c("Total_fund","Year")

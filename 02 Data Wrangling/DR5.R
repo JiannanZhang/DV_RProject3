@@ -1,0 +1,1 @@
+join_by_city_left <- left_join(df_07_city_total_fund,df_06_city_total_fund,by = "RECIPIENT_CITY_NAME")

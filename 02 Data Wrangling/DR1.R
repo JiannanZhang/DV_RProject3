@@ -1,0 +1,1 @@
+df_06_city_spending <- df_06 %>% select(RECIPIENT_CITY_NAME,FED_FUNDING_AMOUNT_06) %>% filter(RECIPIENT_CITY_NAME != "")

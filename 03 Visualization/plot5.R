@@ -1,0 +1,1 @@
+df_fund_year %>% ggplot(aes(factor(Year),Total_fund)) + geom_boxplot() + theme(axis.text.x=element_text(size=10, face="bold", vjust=1)) + theme(axis.title.x=element_text(color="forestgreen", vjust=0.35),axis.title.y=element_text(color="cadetblue", vjust=0.35)) + labs(title="Boxplot",y="Total_fund",x="Year")
