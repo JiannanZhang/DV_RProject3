@@ -17,6 +17,7 @@ __1. Loading of R packages: RCurl, ggplot2, extrafont, jsonlite, dplyr, tidyr (R
 library(RCurl)
 library (ggplot2)
 library(extrafont)
+library(reshape2)
 require("jsonlite")
 require(dplyr)
 require(tidyr)
@@ -81,13 +82,13 @@ Now I will make a boxplot to see the range and quatiles of 2006 fund and 2007 fu
 ```{r}
 df_total_fund <- c(join_by_city$Total_fed_fund_06, join_by_city$Total_fed_fund_07)
 df_total_fund <- data.frame(df_total_fund)
-df_year <- c(rep(c(2006),each=44),rep(c(2007),each=44))
+df_year <- c(rep(c(2006),each=45),rep(c(2007),each=45))
 df_year <- data.frame(df_year)
 df_fund_year <- data.frame(df_total_fund,df_year)
 names(df_fund_year) <- c("Total_fund","Year")
 ```
 
-Plot the boxplot. Since there are many outliers in 2006 and 2007 as we can see, the boxplot is made to be very "narrow". But clearly we can see the median or fifty percentile in 2007 is bigger than that in 2006. Moreover, the total_fund of 2007 is more concentrated than that of 2006.
+Plot the boxplot. Since there are many big outliers in 2006 and 2007 as we can see, the "box"" is compressed to be very "narrow" (almost a line as we can see). But we can see the median or fifty percentile in 2007 is a little bigger than that in 2006. Moreover, the total_fund of 2006 is more concentrated than that of 2007.
 ```{r}
 df_fund_year %>% ggplot(aes(factor(Year),Total_fund)) + geom_boxplot() + theme(axis.text.x=element_text(size=10, face="bold", vjust=1)) + theme(axis.title.x=element_text(color="forestgreen", vjust=0.35),axis.title.y=element_text(color="cadetblue", vjust=0.35)) + labs(title="Boxplot",y="Total_fund",x="Year")
 ```

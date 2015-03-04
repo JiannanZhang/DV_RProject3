@@ -7,7 +7,7 @@ output: html_document
 
 Project 3 required Jeffrey and I to import a large dataset into Oracle Server and call the data into RStudio for analysis. Below will describe the dataset and the following analysis. 
 
-Dataset: GOVSPENDING2007, GOVSPENDING2007, GOVSPENDING2008, GOVSPENDING2009
+Dataset: GOVSPENDING2007, GOVSPENDING2007, GOVSPENDING2008, CENSUSCOUNTY
 
 Oracle SQL Developer: C##CS329E_JCN565
 
@@ -110,7 +110,7 @@ source("../01 data/dfcensus.R",echo = T)
 ## 
 ## > q = "CENSUS2010POP"
 ## 
-## > i = "STNAME"
+## > i = "UPPER(PRINCIPAL_PLACE_STATE)"
 ## 
 ## > k = "UPPER(RECIPIENT_COUNTY_NAME)"
 ## 
@@ -125,18 +125,18 @@ tbl_df(dfpop)
 ```
 ## Source: local data frame [3,194 x 3]
 ## 
-##      STNAME UPPER.RECIPIENT_COUNTY_NAME. CENSUS2010POP
-## 1  Arkansas               JOHNSON COUNTY         25540
-## 2  Arkansas             LAFAYETTE COUNTY          7645
-## 3  Arkansas              LAWRENCE COUNTY         17415
-## 4  Arkansas                   LEE COUNTY         10424
-## 5  Arkansas               LINCOLN COUNTY         14134
-## 6  Arkansas          LITTLE RIVER COUNTY         13171
-## 7  Arkansas                 LOGAN COUNTY         22353
-## 8  Arkansas                LONOKE COUNTY         68356
-## 9  Arkansas               MADISON COUNTY         15717
-## 10 Arkansas                MARION COUNTY         16653
-## ..      ...                          ...           ...
+##    UPPER.PRINCIPAL_PLACE_STATE. UPPER.RECIPIENT_COUNTY_NAME. CENSUS2010POP
+## 1                      ARKANSAS               JOHNSON COUNTY         25540
+## 2                      ARKANSAS             LAFAYETTE COUNTY          7645
+## 3                      ARKANSAS              LAWRENCE COUNTY         17415
+## 4                      ARKANSAS                   LEE COUNTY         10424
+## 5                      ARKANSAS               LINCOLN COUNTY         14134
+## 6                      ARKANSAS          LITTLE RIVER COUNTY         13171
+## 7                      ARKANSAS                 LOGAN COUNTY         22353
+## 8                      ARKANSAS                LONOKE COUNTY         68356
+## 9                      ARKANSAS               MADISON COUNTY         15717
+## 10                     ARKANSAS                MARION COUNTY         16653
+## ..                          ...                          ...           ...
 ```
 __3. begin analysis__
 First we want to know how many federal funds that each city has. A city could receive the federal funds many times a year and there are also some blank entries (no city names). I did these data wrangling in the following: 
@@ -168,13 +168,138 @@ First I used left_join to join df_07_city_total_fund with df_06_city_total_fund.
 range and quatiles of 2007 city funding without comparing to 2006 city funding. Therefore I made an boxplot for that. From the graph, we can see that there are too many outliers in df_07_city_total_fund. The range is pretty big and the distribution is extremely skewed to the right
 
 
+```r
+join_by_city_left <- left_join(df_07_city_total_fund,df_06_city_total_fund,by = "RECIPIENT_CITY_NAME")
+boxplot(join_by_city_left$total_spending.x)
+```
+
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png) 
+
+Now I inner join two datasets by city to make more sense
+
+```r
+join_by_city <- inner_join(df_06_city_total_fund,df_07_city_total_fund,by = "RECIPIENT_CITY_NAME")
+names(join_by_city) <- c("City","Total_fed_fund_06","Total_fed_fund_07")
+```
+
+Use bubble plot to visualize the gragh. First plot bubble plot: fed_fund_06 VS Cities
+From the bubble graph, we can easily to see the difference of federal fund amount between these cities by the bubble size
+
+```r
+join_by_city %>% ggplot(aes(x=City, y=Total_fed_fund_06, size = Total_fed_fund_06,color=Total_fed_fund_06)) + geom_point() + theme(axis.text.x=element_text(angle=90, size=20, vjust=0.5)) + theme(axis.text.x=element_text(size=10, face="bold", vjust=1)) + theme(axis.title.x=element_text(color="forestgreen", vjust=0.35),axis.title.y=element_text(color="cadetblue", vjust=0.35)) + labs(title="Fed_fund_06 VS Cities",y="Total_fund",x="City")
+```
+
+```
+## Warning: Removed 1 rows containing missing values (geom_point).
+```
+
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png) 
+
+Same for 2007
+
+```r
+join_by_city %>% ggplot(aes(x=City, y=Total_fed_fund_07, size = Total_fed_fund_07,color=Total_fed_fund_07)) + geom_point() + theme(axis.text.x=element_text(angle=90, size=20, vjust=0.5)) + theme(axis.text.x=element_text(size=10, face="bold", vjust=1)) + theme(axis.title.x=element_text(color="forestgreen", vjust=0.35),axis.title.y=element_text(color="cadetblue", vjust=0.35)) + labs(title="Fed_fund_07 VS Cities",y="Total_fund",x="City")
+```
+
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
+
+Now I will make a boxplot to see the range and quatiles of 2006 fund and 2007 fund 
+
+```r
+df_total_fund <- c(join_by_city$Total_fed_fund_06, join_by_city$Total_fed_fund_07)
+df_total_fund <- data.frame(df_total_fund)
+df_year <- c(rep(c(2006),each=45),rep(c(2007),each=45))
+df_year <- data.frame(df_year)
+df_fund_year <- data.frame(df_total_fund,df_year)
+names(df_fund_year) <- c("Total_fund","Year")
+```
+
+Plot the boxplot. Since there are many big outliers in 2006 and 2007 as we can see, the "box"" is compressed to be very "narrow" (almost a line as we can see). But we can see the median or fifty percentile in 2007 is a little bigger than that in 2006. Moreover, the total_fund of 2006 is more concentrated than that of 2007.
+
+```r
+df_fund_year %>% ggplot(aes(factor(Year),Total_fund)) + geom_boxplot() + theme(axis.text.x=element_text(size=10, face="bold", vjust=1)) + theme(axis.title.x=element_text(color="forestgreen", vjust=0.35),axis.title.y=element_text(color="cadetblue", vjust=0.35)) + labs(title="Boxplot",y="Total_fund",x="Year")
+```
+
+```
+## Warning: Removed 1 rows containing non-finite values (stat_boxplot).
+```
+
+![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png) 
 
 
 
+```r
+names(dfpop) <- c('PRINCIPAL_PLACE_STATE','RECIPIENT_COUNTY_NAME','POPULATION')
+df_state <- dfpop %>% select (PRINCIPAL_PLACE_STATE, POPULATION) %>% group_by(PRINCIPAL_PLACE_STATE) %>% summarise(sum(POPULATION))
+df_state06 <- df_06 %>% select (PRINCIPAL_PLACE_STATE, FED_FUNDING_AMOUNT_06) %>% group_by(PRINCIPAL_PLACE_STATE) %>% summarise(sum(FED_FUNDING_AMOUNT_06))
+df_state07 <- df_07 %>% select (PRINCIPAL_PLACE_STATE, FED_FUNDING_AMOUNT_07) %>% group_by(PRINCIPAL_PLACE_STATE) %>% summarise(sum(FED_FUNDING_AMOUNT_07))
+
+dfsamestate <- inner_join(df_state06,df_state07,by = 'PRINCIPAL_PLACE_STATE')
+mdf <- melt(dfsamestate, id.vars = 'PRINCIPAL_PLACE_STATE', measure.vars = c('sum(FED_FUNDING_AMOUNT_06)', 'sum(FED_FUNDING_AMOUNT_07)')) %>% ggplot(aes(x = PRINCIPAL_PLACE_STATE, y = value, color = variable)) + geom_point()
 
 
 
+dffull <- full_join(df_state06,df_state07, by = 'PRINCIPAL_PLACE_STATE')
+```
 
+```
+## Error in eval(expr, envir, enclos): could not find function "full_join"
+```
 
+```r
+names(dffull) <- c('PRINCIPAL_PLACE_STATE','FED_FUNDING_AMOUNT_06','FED_FUNDING_AMOUNT_07')
+```
+
+```
+## Error in names(dffull) <- c("PRINCIPAL_PLACE_STATE", "FED_FUNDING_AMOUNT_06", : object 'dffull' not found
+```
+
+```r
+dfsum <- dffull %>% select(FED_FUNDING_AMOUNT_06, FED_FUNDING_AMOUNT_07)  %>% summarise(T_FED_FUNDING_AMOUNT_06=cumsum(FED_FUNDING_AMOUNT_06), T_FED_FUNDING_AMOUNT_07 = cumsum(FED_FUNDING_AMOUNT_07))
+```
+
+```
+## Error in eval(expr, envir, enclos): object 'dffull' not found
+```
+
+```r
+dffull2 <- inner_join(dffull, df_state, by = 'PRINCIPAL_PLACE_STATE')
+```
+
+```
+## Error in inner_join(dffull, df_state, by = "PRINCIPAL_PLACE_STATE"): object 'dffull' not found
+```
+
+```r
+names(dffull2) <- c('PRINCIPAL_PLACE_STATE','FED_FUNDING_AMOUNT_06','FED_FUNDING_AMOUNT_07', 'POPULATION')
+```
+
+```
+## Error in names(dffull2) <- c("PRINCIPAL_PLACE_STATE", "FED_FUNDING_AMOUNT_06", : object 'dffull2' not found
+```
+
+```r
+dffull3 <- dffull2 %>% mutate(perperson06 = FED_FUNDING_AMOUNT_06/POPULATION, perperson07 = FED_FUNDING_AMOUNT_07/POPULATION)
+```
+
+```
+## Error in eval(expr, envir, enclos): object 'dffull2' not found
+```
+
+```r
+mdf2 <- melt(dffull3, id.vars = 'PRINCIPAL_PLACE_STATE', measure.vars= c('perperson06','perperson07'))
+```
+
+```
+## Error in melt(dffull3, id.vars = "PRINCIPAL_PLACE_STATE", measure.vars = c("perperson06", : object 'dffull3' not found
+```
+
+```r
+ggplot(mdf2,aes(x = PRINCIPAL_PLACE_STATE, y = value, color = variable)) + geom_point()  + theme(axis.text.x=element_text(angle=90, size=12, vjust=0.5)) + labs(title="Governmental Funding Broken Down\nPer Person",y="Total Funding per Person",x="State")
+```
+
+```
+## Error in ggplot(mdf2, aes(x = PRINCIPAL_PLACE_STATE, y = value, color = variable)): object 'mdf2' not found
+```
 
 
