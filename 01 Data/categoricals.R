@@ -13,7 +13,7 @@ df_06 <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?
 l <- list()
 for (i in names(df_06)) { 
   if (i %in% categoricals[[1]]) {
-    r <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?query="select "i", count(*) n from GOVSPENDING2006 group by "i" "'), httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521:ORCL',USER='C##cs329e_jcn565',PASS='orcl_jcn565',MODE='native_mode',MODEL='model',returnDimensions = 'False',returnFor = 'JSON', i='RECIPIENT_CITY_NAME'),verbose = TRUE)))
+    r <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?query="select "i", count(*) n from GOVSPENDING2006 group by "i" "'), httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521:ORCL',USER='C##cs329e_jcn565',PASS='orcl_jcn565',MODE='native_mode',MODEL='model',returnDimensions = 'False',returnFor = 'JSON', i=i),verbose = TRUE)))
     p <- myplot(r,i)
     print(p) 
     l[[i]] <- p
@@ -52,7 +52,7 @@ myplot1 <- function(df, x) {
 t <- list()
 for (i in names(df_06)) {   
   if (i %in% categoricals[[2]]) {
-    r <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?query="select "i" from GOVSPENDING2006 where "i" is not null "'),httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521:ORCL',USER='C##cs329e_jcn565',PASS='orcl_jcn565',MODE='native_mode',MODEL='model',returnDimensions = 'False',returnFor = 'JSON', i='RECIPIENT_CITY_NAME'),verbose = TRUE)))
+    r <- data.frame(fromJSON(getURL(URLencode('129.152.144.84:5001/rest/native/?query="select "i" from GOVSPENDING2006 where "i" is not null "'),httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521:ORCL',USER='C##cs329e_jcn565',PASS='orcl_jcn565',MODE='native_mode',MODEL='model',returnDimensions = 'False',returnFor = 'JSON', i=i),verbose = TRUE)))
     j <- myplot1(r,i)
     print(j) 
     t[[i]] <- j
