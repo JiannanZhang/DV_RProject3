@@ -52,6 +52,7 @@ tbl_df(dfpop)
 __3. Analysis__
 First we want to know how many federal funds that each city has. A city could receive the federal funds many times a year and there are also some blank entries (no city names). I did these data wrangling in the following: 
 
+
 __First I plotted the original dataset for df_06__
 ```{r}
 source("../03 Visualization/plot1.R",echo = T)
@@ -129,4 +130,12 @@ mdf2 <- melt(dffull3, id.vars = 'PRINCIPAL_PLACE_STATE', measure.vars= c('perper
 mdf2 %>% ggplot(aes(x = PRINCIPAL_PLACE_STATE, y = value, color = variable)) + geom_point()  + theme(axis.text.x=element_text(angle=90, size=10, vjust=0.5)) + labs(title="Governmental Funding Broken Down\nPer Person Per State", y="Total Funding per Person",x="State")
 ```
 
+```{r}
+df_06_total_fund <- df_06_city_spending %>% select(FED_FUNDING_AMOUNT_06) %>% summarise(avg06 = mean(FED_FUNDING_AMOUNT_06))
+df_07_total_fund <- df_07_city_spending %>% select(FED_FUNDING_AMOUNT_07) %>% summarise(avg07 = mean(FED_FUNDING_AMOUNT_07))
+df_08_total_fund <- df_08 %>% select(FED_FUNDING_AMOUNT_08) %>% summarise(avg08 = mean(FED_FUNDING_AMOUNT_08))
+df_09_total_fund <- df_09 %>% select(FED_FUNDING_AMOUNT_09) %>% summarise(avg09 = mean(FED_FUNDING_AMOUNT_09))
 
+bind_cols(df_06_total_fund, df_07_total_fund) %>%bind_cols(df_08_total_fund, df_09_total_fund) %>% gather(,"Average") %>% ggplot(aes(x = key, y = Average, group = 1)) + geom_point() + geom_line()
+
+```
