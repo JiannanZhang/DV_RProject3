@@ -3,7 +3,7 @@
 
 myplot <- function(df, x) {
   names(df) <- c("x", "n")
-  ggplot(df, aes(x=x, y=n)) + geom_point() + theme(axis.text.x=element_text(angle=90, size=5, vjust=0.5)) + labs(title="Categorical Variable Visual", y="Count(n)",x="X")
+  ggplot(df, aes(x=x, y=n)) + geom_point() + theme(axis.text.x=element_text(angle=90, size=5, vjust=0.5)) + labs(title="Categorical Variable Visual", y="Count(n)",x=x)
 }
 
 categoricals <- eval(parse(text=substring(getURL(URLencode('http://129.152.144.84:5001/rest/native/?query="select * from GOVSPENDING2006"'), httpheader=c(DB='jdbc:oracle:thin:@129.152.144.84:1521:ORCL', USER='C##cs329e_jcn565', PASS='orcl_jcn565', MODE='native_mode', MODEL='model', returnFor = 'R', returnDimensions = 'True'), verbose = TRUE), 1, 2^31-1)))

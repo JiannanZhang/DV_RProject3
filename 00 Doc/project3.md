@@ -1,17 +1,29 @@
 ---
 title: "Project 3"
 author: "Jeffrey Zhang and Jaclyn Nguyen"
-date: "Monday, February 16, 2015"
+date: "Wednesday, March 4, 2015"
 output: html_document
 ---
 
-Project 3 required Jeffrey and I to import a large dataset into Oracle Server and call the data into RStudio for analysis. Below will describe the dataset and the following analysis. 
-___
-Dataset: GOVSPENDING2007, GOVSPENDING2007, GOVSPENDING2008, CENSUSCOUNTY
+Project 3 required Jeffrey and I to import a multiple large datasets into Oracle Server and call the data into RStudio for analysis. Below will describe the dataset and the following analysis. 
+
+Dataset: GOVSPENDING2007, GOVSPENDING2007, GOVSPENDING2008, GOVSPENDING2009, CENSUSCOUNTY
+
+Description of data:
+Every year, the US Federal Government allocates money into different areas such as grants, contracts, loans, insurance, direct payments, and others.Jeffrey and I will concentrate on the Federal Spending - Others which include federal spending on items that were originally not budgeted for in the fiscal year. Below describes the types of funding from the federal government:
+A. New assistance action (new program initiatves)
+B. Continuation (funding in succeeding budget period which stemmed from prior agreement to fund amount of the current action)
+C. Revision (any change in Federal Government's financial obligation or contingent liability in existing assistance transaction amount)
+D. Funding adjustment to completed project
+
+[DATA FEEDS AND ARCHIVES DATA DICTIONARY](http://www.usaspending.gov/sites/all/themes/usaspendingv2/Archives_Data_Feeds_Data_Dictionary.pdf) provides additional information on the following data
+
+In order to support further analysis, we are using census data to determine efficacy of the funding.
 
 Oracle SQL Developer: C##CS329E_JCN565
+___
 
-__1. Loading of R packages: RCurl, ggplot2, extrafont, jsonlite, dplyr, tidyr (R code not shown)__
+__1. Loading of R packages: RCurl, ggplot2, extrafont, jsonlite, dplyr, tidyr, extrafont, jsonlite, reshape2 (R code not shown)__
 
 
 
@@ -99,6 +111,73 @@ tbl_df(df_07)
 ```
 
 ```r
+source("../01 data/df_08.R",echo = T)
+```
+
+```
+## 
+## > df_08 <- data.frame(fromJSON(getURL(URLencode("129.152.144.84:5001/rest/native/?query=\"select * from GOVSPENDING2008\""), 
+## +     httpheader = c(DB  .... [TRUNCATED]
+```
+
+```r
+tbl_df(df_08)
+```
+
+```
+## Source: local data frame [4,896 x 9]
+## 
+##               UNIQUE_TRANSACTION_ID
+## 1  08d66e98fd7db327996f838fa561623e
+## 2  58c766583a6c5a284a6f2f3650dccf4f
+## 3  57e56b2df0988fc5b560129c53c3d088
+## 4  db00d5d99ad419ecca0e83dab8915299
+## 5  0f6cd859b1dbf40f4ff84e7f15191a7c
+## 6  4e017e9aeea0080b07449510e270bb00
+## 7  8c87cfd5925bdf72c9f93a8d67adabe3
+## 8  56ea528a56ade4d912ee5a752e38702c
+## 9  bb9bd703821efc304c935a6771126ae8
+## 10 59f17815d6a5372f2c90c1589ba0e1d8
+## ..                              ...
+## Variables not shown: ACCOUNT_TITLE (fctr), RECIPIENT_ZIP (fctr),
+##   RECIPIENT_TYPE (fctr), AGENCY_CODE (fctr), FED_FUNDING_AMOUNT_08 (int),
+##   AGENCY_NAME (fctr), RECIP_CAT_TYPE (fctr), MAJ_AGENCY_CAT (fctr)
+```
+
+```r
+source("../01 data/df_09.R",echo = T)
+```
+
+```
+## 
+## > df_09 <- data.frame(fromJSON(getURL(URLencode("129.152.144.84:5001/rest/native/?query=\"select * from GOVSPENDING2009\""), 
+## +     httpheader = c(DB  .... [TRUNCATED]
+```
+
+```r
+tbl_df(df_09)
+```
+
+```
+## Source: local data frame [3,097 x 5]
+## 
+##               UNIQUE_TRANSACTION_ID RECIPIENT_ZIP
+## 1  e6eff530bc87b5e4b776c62cbfa1fde3     245310230
+## 2  168030ed49f771ffb8cd6a7b650ea7e0     286408967
+## 3  a54bbd8656d7e4e657f9a95aec3856b9     737420367
+## 4  04b65b64190719998ab67e864892f288     980571037
+## 5  c27fedc633266a87371d7fe45af78dc7     541663843
+## 6  99d92713cb6c47c964e888e3dfc4c02c     386760639
+## 7  8ee789de19fc5cfa55765e56b063cd0e     770425312
+## 8  a716fff85bf53caf9ab96e6b48b45687     713512383
+## 9  aa6b13806c036f58f7ea251483bd429a     398420511
+## 10 43cc5749dea503d20e99cea6b4f782b2     900480001
+## ..                              ...           ...
+## Variables not shown: RECIPIENT_TYPE (fctr), FED_FUNDING_AMOUNT_09 (int),
+##   PRINCIPAL_PLACE_STATE (fctr)
+```
+
+```r
 source("../01 data/dfcensus.R",echo = T)
 ```
 
@@ -138,8 +217,9 @@ tbl_df(dfpop)
 ## 10                     ARKANSAS                MARION COUNTY         16653
 ## ..                          ...                          ...           ...
 ```
-__3. begin analysis__
+__3. Analysis__
 First we want to know how many federal funds that each city has. A city could receive the federal funds many times a year and there are also some blank entries (no city names). I did these data wrangling in the following: 
+
 
 __First I plotted the original dataset for df_06__
 
@@ -181,7 +261,7 @@ source("../02 Data Wrangling/DR2.R",echo = T)
 ## +     "")
 ```
 
-__I sum the totol funds for each city for both df_06 and df_07__
+__I sum the total funds for each city for both df_06 and df_07__
 
 ```r
 source("../02 Data Wrangling/DR3.R",echo = T)
@@ -189,8 +269,9 @@ source("../02 Data Wrangling/DR3.R",echo = T)
 
 ```
 ## 
-## > df_06_city_total_fund <- df_06_city_spending %>% select(RECIPIENT_CITY_NAME) %>% 
-## +     group_by(RECIPIENT_CITY_NAME) %>% summarize(total_spending = .... [TRUNCATED]
+## > df_06_city_total_fund <- df_06_city_spending %>% select(RECIPIENT_CITY_NAME, 
+## +     FED_FUNDING_AMOUNT_06) %>% group_by(RECIPIENT_CITY_NAME) %>% 
+## +  .... [TRUNCATED]
 ```
 
 ```r
@@ -199,8 +280,9 @@ source("../02 Data Wrangling/DR4.R",echo = T)
 
 ```
 ## 
-## > df_07_city_total_fund <- df_07_city_spending %>% select(RECIPIENT_CITY_NAME) %>% 
-## +     group_by(RECIPIENT_CITY_NAME) %>% summarize(total_spending = .... [TRUNCATED]
+## > df_07_city_total_fund <- df_07_city_spending %>% select(RECIPIENT_CITY_NAME, 
+## +     FED_FUNDING_AMOUNT_07) %>% group_by(RECIPIENT_CITY_NAME) %>% 
+## +  .... [TRUNCATED]
 ```
 
 __First I used left_join to join df_07_city_total_fund with df_06_city_total_fund. I found that there are many unmatched records in df_06_city_total_fund. So at this point, I am only intertested in the range and quatiles of 2007 city funding without comparing to 2006 city funding. Therefore I made an boxplot for that. From the graph, we can see that there are too many outliers in df_07_city_total_fund. The range is pretty big and the distribution is extremely skewed to the right__
@@ -222,7 +304,8 @@ source("../03 Visualization/plot2.R",echo = T)
 
 ```
 ## 
-## > boxplot(join_by_city_left$total_spending.x)
+## > boxplot(join_by_city_left$total_spending.x, main = "Boxplot", 
+## +     xlab = "2007", ylab = "Total_fund")
 ```
 
 ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png) 
@@ -253,10 +336,6 @@ source("../03 Visualization/plot3.R",echo = T)
 ## > join_by_city %>% ggplot(aes(x = City, y = Total_fed_fund_06, 
 ## +     size = Total_fed_fund_06, color = Total_fed_fund_06)) + geom_point() + 
 ## +     th .... [TRUNCATED]
-```
-
-```
-## Warning: Removed 1 rows containing missing values (geom_point).
 ```
 
 ![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png) 
@@ -312,10 +391,6 @@ source("../03 Visualization/plot5.R",echo = T)
 ## +     face = "bold", v .... [TRUNCATED]
 ```
 
-```
-## Warning: Removed 1 rows containing non-finite values (stat_boxplot).
-```
-
 ![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png) 
 
 
@@ -327,10 +402,13 @@ df_state06 <- df_06 %>% select (PRINCIPAL_PLACE_STATE, FED_FUNDING_AMOUNT_06) %>
 df_state07 <- df_07 %>% select (PRINCIPAL_PLACE_STATE, FED_FUNDING_AMOUNT_07) %>% group_by(PRINCIPAL_PLACE_STATE) %>% summarise(sum(FED_FUNDING_AMOUNT_07))
 
 dfsamestate <- inner_join(df_state06,df_state07,by = 'PRINCIPAL_PLACE_STATE')
-mdf <- melt(dfsamestate, id.vars = 'PRINCIPAL_PLACE_STATE', measure.vars = c('sum(FED_FUNDING_AMOUNT_06)', 'sum(FED_FUNDING_AMOUNT_07)')) %>% ggplot(aes(x = PRINCIPAL_PLACE_STATE, y = value, color = variable)) + geom_point()
+mdf <- melt(dfsamestate, id.vars = 'PRINCIPAL_PLACE_STATE', measure.vars = c('sum(FED_FUNDING_AMOUNT_06)', 'sum(FED_FUNDING_AMOUNT_07)'))
+mdf %>% ggplot(aes(x = PRINCIPAL_PLACE_STATE, y = value, color = variable)) + geom_point()+theme(axis.text.x=element_text(angle=90, size=10, vjust=0.5)) + labs(title="Governmental Funding Broken Down\nPer Person Per State", y="Total Funding per Person",x="State")
+```
 
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
 
-
+```r
 dffull <- full_join(df_state06,df_state07, by = 'PRINCIPAL_PLACE_STATE')
 ```
 
@@ -344,14 +422,6 @@ names(dffull) <- c('PRINCIPAL_PLACE_STATE','FED_FUNDING_AMOUNT_06','FED_FUNDING_
 
 ```
 ## Error in names(dffull) <- c("PRINCIPAL_PLACE_STATE", "FED_FUNDING_AMOUNT_06", : object 'dffull' not found
-```
-
-```r
-dfsum <- dffull %>% select(FED_FUNDING_AMOUNT_06, FED_FUNDING_AMOUNT_07)  %>% summarise(T_FED_FUNDING_AMOUNT_06=cumsum(FED_FUNDING_AMOUNT_06), T_FED_FUNDING_AMOUNT_07 = cumsum(FED_FUNDING_AMOUNT_07))
-```
-
-```
-## Error in eval(expr, envir, enclos): object 'dffull' not found
 ```
 
 ```r
@@ -387,11 +457,23 @@ mdf2 <- melt(dffull3, id.vars = 'PRINCIPAL_PLACE_STATE', measure.vars= c('perper
 ```
 
 ```r
-ggplot(mdf2,aes(x = PRINCIPAL_PLACE_STATE, y = value, color = variable)) + geom_point()  + theme(axis.text.x=element_text(angle=90, size=12, vjust=0.5)) + labs(title="Governmental Funding Broken Down\nPer Person",y="Total Funding per Person",x="State")
+mdf2 %>% ggplot(aes(x = PRINCIPAL_PLACE_STATE, y = value, color = variable)) + geom_point()  + theme(axis.text.x=element_text(angle=90, size=10, vjust=0.5)) + labs(title="Governmental Funding Broken Down\nPer Person Per State", y="Total Funding per Person",x="State")
 ```
 
 ```
-## Error in ggplot(mdf2, aes(x = PRINCIPAL_PLACE_STATE, y = value, color = variable)): object 'mdf2' not found
+## Error in eval(expr, envir, enclos): object 'mdf2' not found
 ```
 
 
+```r
+df_06_total_fund <- df_06_city_spending %>% select(FED_FUNDING_AMOUNT_06) %>% summarise(avg06 = mean(FED_FUNDING_AMOUNT_06))
+df_07_total_fund <- df_07_city_spending %>% select(FED_FUNDING_AMOUNT_07) %>% summarise(avg07 = mean(FED_FUNDING_AMOUNT_07))
+df_08_total_fund <- df_08 %>% select(FED_FUNDING_AMOUNT_08) %>% summarise(avg08 = mean(FED_FUNDING_AMOUNT_08))
+df_09_total_fund <- df_09 %>% select(FED_FUNDING_AMOUNT_09) %>% summarise(avg09 = mean(FED_FUNDING_AMOUNT_09))
+
+bind_cols(df_06_total_fund, df_07_total_fund) %>%bind_cols(df_08_total_fund, df_09_total_fund) %>% gather(,"Average") %>% ggplot(aes(x = key, y = Average, group = 1)) + geom_point() + geom_line()
+```
+
+```
+## Error in eval(expr, envir, enclos): could not find function "bind_cols"
+```
