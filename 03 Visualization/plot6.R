@@ -1,0 +1,2 @@
+mdf <- melt(dfsamestate, id.vars = 'PRINCIPAL_PLACE_STATE', measure.vars = c('sum(FED_FUNDING_AMOUNT_06)', 'sum(FED_FUNDING_AMOUNT_07)'))
+mdf %>% ggplot(aes(x = PRINCIPAL_PLACE_STATE, y = value, color = variable)) + geom_point()+theme(axis.text.x=element_text(angle=90, size=10, vjust=0.5)) + labs(title="Governmental Funding Broken Down\nBy State", y="Funding(Dollars)",x="State")
