@@ -10,10 +10,14 @@ Project 3 required us to import a multiple large datasets into Oracle Server and
 Dataset: GOVSPENDING2006(161 obs), GOVSPENDING2007(3024 obs), GOVSPENDING2008(4896 obs), GOVSPENDING2009(3194 obs), CENSUSCOUNTY(3194 obs)
 
 Description of data:
-Every year, the US Federal Government allocates money into different areas such as grants, contracts, loans, insurance, direct payments, and others.Jeffrey and I will concentrate on the Federal Spending - Others which include federal spending on items that were originally not budgeted for in the fiscal year. Below describes the types of funding from the federal government:
+Every year, the US Federal Government allocates money into different areas such as grants, contracts, loans, insurance, direct payments, and others.The US Federal Website breaks the funding into different datasets available publicly based on the category of funding. For this project, we will concentrate on the Federal Spending - Others which include federal spending on items that were originally not budgeted for in the fiscal year. Below describes the types of funding from the federal government in the "Others" category:
+
 A. New assistance action (new program initiatves)
+
 B. Continuation (funding in succeeding budget period which stemmed from prior agreement to fund amount of the current action)
+
 C. Revision (any change in Federal Government's financial obligation or contingent liability in existing assistance transaction amount)
+
 D. Funding adjustment to completed project
 
 [DATA FEEDS AND ARCHIVES DATA DICTIONARY](http://www.usaspending.gov/sites/all/themes/usaspendingv2/Archives_Data_Feeds_Data_Dictionary.pdf) provides additional information on the following data
@@ -21,7 +25,7 @@ D. Funding adjustment to completed project
 In order to support further analysis, we are using census data to determine efficacy of the funding.
 
 Oracle SQL Developer: C##CS329E_JCN565
-___
+
 
 __1. Loading of R packages: RCurl, ggplot2, extrafont, jsonlite, dplyr, tidyr, extrafont, jsonlite, reshape2 (R code not shown)__
 
