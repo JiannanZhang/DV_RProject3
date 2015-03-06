@@ -5,9 +5,9 @@ date: "Wednesday, March 4, 2015"
 output: html_document
 ---
 
-Project 3 required Jeffrey and I to import a multiple large datasets into Oracle Server and call the data into RStudio for analysis. Below will describe the dataset and the following analysis. 
+Project 3 required us to import a multiple large datasets into Oracle Server and call the data into RStudio for analysis. Below will describe the dataset and the following analysis. 
 
-Dataset: GOVSPENDING2007, GOVSPENDING2007, GOVSPENDING2008, GOVSPENDING2009, CENSUSCOUNTY
+Dataset: GOVSPENDING2006(161 obs), GOVSPENDING2007(3024 obs), GOVSPENDING2008(4896 obs), GOVSPENDING2009(3194 obs), CENSUSCOUNTY(3194 obs)
 
 Description of data:
 Every year, the US Federal Government allocates money into different areas such as grants, contracts, loans, insurance, direct payments, and others.Jeffrey and I will concentrate on the Federal Spending - Others which include federal spending on items that were originally not budgeted for in the fiscal year. Below describes the types of funding from the federal government:
@@ -218,10 +218,11 @@ tbl_df(dfpop)
 ## ..                          ...                          ...           ...
 ```
 __3. Analysis__
+
 First we want to know how many federal funds that each city has. A city could receive the federal funds many times a year and there are also some blank entries (no city names). I did these data wrangling in the following: 
 
 
-__First I plotted the original dataset for df_06__
+First I plotted the original dataset for df_06
 
 ```r
 source("../03 Visualization/plot1.R",echo = T)
@@ -236,7 +237,7 @@ source("../03 Visualization/plot1.R",echo = T)
 
 ![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png) 
 
-__I filtered the blank entries for both df_06 and df_07__
+I filtered the blank entries for both df_06 and df_07
 
 
 ```r
@@ -261,7 +262,7 @@ source("../02 Data Wrangling/DR2.R",echo = T)
 ## +     "")
 ```
 
-__I sum the total funds for each city for both df_06 and df_07__
+I sum the total funds for each city for both df_06 and df_07
 
 ```r
 source("../02 Data Wrangling/DR3.R",echo = T)
@@ -285,7 +286,7 @@ source("../02 Data Wrangling/DR4.R",echo = T)
 ## +  .... [TRUNCATED]
 ```
 
-__First I used left_join to join df_07_city_total_fund with df_06_city_total_fund. I found that there are many unmatched records in df_06_city_total_fund. So at this point, I am only intertested in the range and quatiles of 2007 city funding without comparing to 2006 city funding. Therefore I made an boxplot for that. From the graph, we can see that there are too many outliers in df_07_city_total_fund. The range is pretty big and the distribution is extremely skewed to the right__
+First I used left_join to join df_07_city_total_fund with df_06_city_total_fund. I found that there are many unmatched records in df_06_city_total_fund. So at this point, I am only intertested in the range and quatiles of 2007 city funding without comparing to 2006 city funding. Therefore I made an boxplot for that. From the graph, we can see that there are too many outliers in df_07_city_total_fund. The range is pretty big and the distribution is extremely skewed to the right
 
 
 ```r
@@ -310,7 +311,7 @@ source("../03 Visualization/plot2.R",echo = T)
 
 ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png) 
 
-__Now I inner join two datasets by city to make more sense__
+Now I inner join two datasets by city to make more sense
 
 ```r
 source("../02 Data Wrangling/DR6.R",echo = T)
@@ -325,7 +326,7 @@ source("../02 Data Wrangling/DR6.R",echo = T)
 ## +     "Total_fed_fund_07")
 ```
 
-__Use a beautiful bubble plot to visualize the gragh. First plot bubble plot: fed_fund_06 VS CitiesFrom the bubble graph, we can easily to see the difference of federal fund amount between these cities by the bubble size__
+Use a beautiful bubble plot to visualize the gragh. First plot bubble plot: fed_fund_06 VS CitiesFrom the bubble graph, we can easily to see the difference of federal fund amount between these cities by the bubble size
 
 ```r
 source("../03 Visualization/plot3.R",echo = T)
@@ -340,7 +341,7 @@ source("../03 Visualization/plot3.R",echo = T)
 
 ![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png) 
 
-__Same for 2007__
+Same for 2007
 
 ```r
 source("../03 Visualization/plot4.R",echo = T)
@@ -355,7 +356,7 @@ source("../03 Visualization/plot4.R",echo = T)
 
 ![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9-1.png) 
 
-__Now I will make a boxplot to see the range and quatiles of 2006 fund and 2007 fund. First I did data wrangling__
+Now I will make a boxplot to see the range and quatiles of 2006 fund and 2007 fund. First I did data wrangling
 
 ```r
 source("../02 Data Wrangling/DR7.R",echo = T)
@@ -378,7 +379,7 @@ source("../02 Data Wrangling/DR7.R",echo = T)
 ## > names(df_fund_year) <- c("Total_fund", "Year")
 ```
 
-__Plot the boxplot. Since there are many big outliers in 2006 and 2007 as we can see, the "box"" is compressed to be very "narrow" (almost a line as we can see). But we can see the median or fifty percentile in 2007 is a little bigger than that in 2006. Moreover, the total_fund of 2006 is more concentrated than that of 2007__
+Plot the boxplot. Since there are many big outliers in 2006 and 2007 as we can see, the "box"" is compressed to be very "narrow" (almost a line as we can see). But we can see the median or fifty percentile in 2007 is a little bigger than that in 2006. Moreover, the total_fund of 2006 is more concentrated than that of 2007
 
 ```r
 source("../03 Visualization/plot5.R",echo = T)
@@ -393,23 +394,64 @@ source("../03 Visualization/plot5.R",echo = T)
 
 ![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png) 
 
+The following analysis will break the funding down based on state during 2006 and 2007.An inner join was used to find the common states/regions that were funded by the federal government.
+
+"null" data represents foreign countries.
 
 
 ```r
-names(dfpop) <- c('PRINCIPAL_PLACE_STATE','RECIPIENT_COUNTY_NAME','POPULATION')
-df_state <- dfpop %>% select (PRINCIPAL_PLACE_STATE, POPULATION) %>% group_by(PRINCIPAL_PLACE_STATE) %>% summarise(sum(POPULATION))
-df_state06 <- df_06 %>% select (PRINCIPAL_PLACE_STATE, FED_FUNDING_AMOUNT_06) %>% group_by(PRINCIPAL_PLACE_STATE) %>% summarise(sum(FED_FUNDING_AMOUNT_06))
-df_state07 <- df_07 %>% select (PRINCIPAL_PLACE_STATE, FED_FUNDING_AMOUNT_07) %>% group_by(PRINCIPAL_PLACE_STATE) %>% summarise(sum(FED_FUNDING_AMOUNT_07))
+source("../02 Data Wrangling/DR9.R", echo=TRUE)
+```
 
-dfsamestate <- inner_join(df_state06,df_state07,by = 'PRINCIPAL_PLACE_STATE')
-mdf <- melt(dfsamestate, id.vars = 'PRINCIPAL_PLACE_STATE', measure.vars = c('sum(FED_FUNDING_AMOUNT_06)', 'sum(FED_FUNDING_AMOUNT_07)'))
-mdf %>% ggplot(aes(x = PRINCIPAL_PLACE_STATE, y = value, color = variable)) + geom_point()+theme(axis.text.x=element_text(angle=90, size=10, vjust=0.5)) + labs(title="Governmental Funding Broken Down\nPer Person Per State", y="Total Funding per Person",x="State")
+```
+## 
+## > names(dfpop) <- c("PRINCIPAL_PLACE_STATE", "RECIPIENT_COUNTY_NAME", 
+## +     "POPULATION")
+## 
+## > df_state <- dfpop %>% select(PRINCIPAL_PLACE_STATE, 
+## +     POPULATION) %>% group_by(PRINCIPAL_PLACE_STATE) %>% summarise(sum(POPULATION))
+## 
+## > df_state06 <- df_06 %>% select(PRINCIPAL_PLACE_STATE, 
+## +     FED_FUNDING_AMOUNT_06) %>% group_by(PRINCIPAL_PLACE_STATE) %>% 
+## +     summarise(sum(FED .... [TRUNCATED] 
+## 
+## > df_state07 <- df_07 %>% select(PRINCIPAL_PLACE_STATE, 
+## +     FED_FUNDING_AMOUNT_07) %>% group_by(PRINCIPAL_PLACE_STATE) %>% 
+## +     summarise(sum(FED .... [TRUNCATED] 
+## 
+## > dfsamestate <- inner_join(df_state06, df_state07, 
+## +     by = "PRINCIPAL_PLACE_STATE")
+```
+
+```r
+source("../03 Visualization/plot6.R", echo=TRUE)
+```
+
+```
+## 
+## > mdf <- melt(dfsamestate, id.vars = "PRINCIPAL_PLACE_STATE", 
+## +     measure.vars = c("sum(FED_FUNDING_AMOUNT_06)", "sum(FED_FUNDING_AMOUNT_07)"))
+## 
+## > mdf %>% ggplot(aes(x = PRINCIPAL_PLACE_STATE, y = value, 
+## +     color = variable)) + geom_point() + theme(axis.text.x = element_text(angle = 90, 
+## +  .... [TRUNCATED]
 ```
 
 ![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
 
+From the above visual, in 2007, Texas was funded the most compared to any other state/region. This would then lead us into further analysis on specific funding that results in the large funding. We would then question Texas' economy and why the funding is need from a federal level compared to a state level.
+
+We also wanted to see which states/regions were funded in 2007, but not in 2006 and vice versa. In this scenario, we used a full join to join the datasets together. But in addition to the full join of the datasets, we pulled in census data dfcensus to see if any particular state/region was funded more than another based on population. A possible null hypothesis is to state that all states/region are funded equally based on their population. The visual below will break down each state representing whether it was funded in 2006 or/and 2007 and the funding amount per person within that state/region.
+
+
+
 ```r
-dffull <- full_join(df_state06,df_state07, by = 'PRINCIPAL_PLACE_STATE')
+source("../02 Data Wrangling/DR10.R", echo=TRUE)
+```
+
+```
+## 
+## > dffull <- full_join(df_state06, df_state07, by = "PRINCIPAL_PLACE_STATE")
 ```
 
 ```
@@ -417,63 +459,54 @@ dffull <- full_join(df_state06,df_state07, by = 'PRINCIPAL_PLACE_STATE')
 ```
 
 ```r
-names(dffull) <- c('PRINCIPAL_PLACE_STATE','FED_FUNDING_AMOUNT_06','FED_FUNDING_AMOUNT_07')
+source("../03 Visualization/plot7.R", echo=TRUE)
 ```
 
 ```
-## Error in names(dffull) <- c("PRINCIPAL_PLACE_STATE", "FED_FUNDING_AMOUNT_06", : object 'dffull' not found
-```
-
-```r
-dffull2 <- inner_join(dffull, df_state, by = 'PRINCIPAL_PLACE_STATE')
-```
-
-```
-## Error in inner_join(dffull, df_state, by = "PRINCIPAL_PLACE_STATE"): object 'dffull' not found
-```
-
-```r
-names(dffull2) <- c('PRINCIPAL_PLACE_STATE','FED_FUNDING_AMOUNT_06','FED_FUNDING_AMOUNT_07', 'POPULATION')
-```
-
-```
-## Error in names(dffull2) <- c("PRINCIPAL_PLACE_STATE", "FED_FUNDING_AMOUNT_06", : object 'dffull2' not found
-```
-
-```r
-dffull3 <- dffull2 %>% mutate(perperson06 = FED_FUNDING_AMOUNT_06/POPULATION, perperson07 = FED_FUNDING_AMOUNT_07/POPULATION)
-```
-
-```
-## Error in eval(expr, envir, enclos): object 'dffull2' not found
-```
-
-```r
-mdf2 <- melt(dffull3, id.vars = 'PRINCIPAL_PLACE_STATE', measure.vars= c('perperson06','perperson07'))
+## 
+## > mdf2 <- melt(dffull3, id.vars = "PRINCIPAL_PLACE_STATE", 
+## +     measure.vars = c("perperson06", "perperson07"))
 ```
 
 ```
 ## Error in melt(dffull3, id.vars = "PRINCIPAL_PLACE_STATE", measure.vars = c("perperson06", : object 'dffull3' not found
 ```
 
-```r
-mdf2 %>% ggplot(aes(x = PRINCIPAL_PLACE_STATE, y = value, color = variable)) + geom_point()  + theme(axis.text.x=element_text(angle=90, size=10, vjust=0.5)) + labs(title="Governmental Funding Broken Down\nPer Person Per State", y="Total Funding per Person",x="State")
-```
-
-```
-## Error in eval(expr, envir, enclos): object 'mdf2' not found
-```
-
+Lastly, we wanted to see federal funding over a four year period. Dataset df_08 and df_09 are federal funding information for their appropriate year. We wrangled the data to determine total funding for that year and was able to plot this over a four year period. However, each dataset held different numbers of funding observations, therefore determining average funding per year (total funding/number of observations) was the best algorithm to represent the data.
 
 ```r
-df_06_total_fund <- df_06_city_spending %>% select(FED_FUNDING_AMOUNT_06) %>% summarise(avg06 = mean(FED_FUNDING_AMOUNT_06))
-df_07_total_fund <- df_07_city_spending %>% select(FED_FUNDING_AMOUNT_07) %>% summarise(avg07 = mean(FED_FUNDING_AMOUNT_07))
-df_08_total_fund <- df_08 %>% select(FED_FUNDING_AMOUNT_08) %>% summarise(avg08 = mean(FED_FUNDING_AMOUNT_08))
-df_09_total_fund <- df_09 %>% select(FED_FUNDING_AMOUNT_09) %>% summarise(avg09 = mean(FED_FUNDING_AMOUNT_09))
+source("../02 Data Wrangling/DR8.R", echo=TRUE)
+```
 
-bind_cols(df_06_total_fund, df_07_total_fund) %>%bind_cols(df_08_total_fund, df_09_total_fund) %>% gather(,"Average") %>% ggplot(aes(x = key, y = Average, group = 1)) + geom_point() + geom_line()
+```
+## 
+## > df_06_total_fund <- df_06_city_spending %>% select(FED_FUNDING_AMOUNT_06) %>% 
+## +     summarise(avg06 = mean(FED_FUNDING_AMOUNT_06))
+## 
+## > df_07_total_fund <- df_07_city_spending %>% select(FED_FUNDING_AMOUNT_07) %>% 
+## +     summarise(avg07 = mean(FED_FUNDING_AMOUNT_07))
+## 
+## > df_08_total_fund <- df_08 %>% select(FED_FUNDING_AMOUNT_08) %>% 
+## +     summarise(avg08 = mean(FED_FUNDING_AMOUNT_08))
+## 
+## > df_09_total_fund <- df_09 %>% select(FED_FUNDING_AMOUNT_09) %>% 
+## +     summarise(avg09 = mean(FED_FUNDING_AMOUNT_09))
+## 
+## > bind_cols(df_06_total_fund, df_07_total_fund) %>% 
+## +     bind_cols(df_08_total_fund, df_09_total_fund) %>% gather(, 
+## +     "Average") %>% ggplot(aes .... [TRUNCATED]
 ```
 
 ```
 ## Error in eval(expr, envir, enclos): could not find function "bind_cols"
 ```
+
+It is interesting to see that although 2006 has the least number of funding transactions of the four years, the average funding significantly surpassess the following years. Further investigation regarding why this is the case would be something interesting.
+
+__4. Creation of PNG breakingdown variables of GOVSPENDING2006 dataset__
+
+Categorical Variables
+![](./categoricals.PNG)
+
+Continuous Variables
+![](./categoricals2.PNG)

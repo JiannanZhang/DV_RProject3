@@ -55,7 +55,7 @@ First we want to know how many federal funds that each city has. A city could re
 
 
 First I plotted the original dataset for df_06
-```{r}
+```{r,fig.width=12}
 source("../03 Visualization/plot1.R",echo = T)
 ```
 
@@ -85,17 +85,17 @@ source("../02 Data Wrangling/DR6.R",echo = T)
 ```
 
 Use a beautiful bubble plot to visualize the gragh. First plot bubble plot: fed_fund_06 VS CitiesFrom the bubble graph, we can easily to see the difference of federal fund amount between these cities by the bubble size
-```{r, warning=FALSE}
+```{r, warning=FALSE,fig.width=12}
 source("../03 Visualization/plot3.R",echo = T)
 ```
 
 Same for 2007
-```{r}
+```{r,fig.width=12}
 source("../03 Visualization/plot4.R",echo = T)
 ```
 
 Now I will make a boxplot to see the range and quatiles of 2006 fund and 2007 fund. First I did data wrangling
-```{r}
+```{r,}
 
 source("../02 Data Wrangling/DR7.R",echo = T)
 
@@ -110,7 +110,7 @@ The following analysis will break the funding down based on state during 2006 an
 
 "null" data represents foreign countries.
 
-```{r, warning = FALSE}
+```{r, warning = FALSE,fig.width=12}
 source("../02 Data Wrangling/DR9.R", echo=TRUE)
 
 source("../03 Visualization/plot6.R", echo=TRUE)
@@ -121,7 +121,7 @@ From the above visual, in 2007, Texas was funded the most compared to any other 
 We also wanted to see which states/regions were funded in 2007, but not in 2006 and vice versa. In this scenario, we used a full join to join the datasets together. But in addition to the full join of the datasets, we pulled in census data dfcensus to see if any particular state/region was funded more than another based on population. A possible null hypothesis is to state that all states/region are funded equally based on their population. The visual below will break down each state representing whether it was funded in 2006 or/and 2007 and the funding amount per person within that state/region.
 
 
-```{r, warning=FALSE}
+```{r, warning=FALSE,fig.width=12}
 source("../02 Data Wrangling/DR10.R", echo=TRUE)
 
 source("../03 Visualization/plot7.R", echo=TRUE)
